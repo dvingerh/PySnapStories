@@ -14,8 +14,8 @@ except ImportError:
 
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
-sep = "-" * 70
-script_version = "1.0"
+sep = "-" * 95
+script_version = "1.1"
 python_version = sys.version.split(' ')[0]
 requests_ua = {'User-Agent': "Mozilla/5.0 (Windows NT 5.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36"}
 story_json_base = "https://storysharing.snapchat.com/v1/fetch/{}?request_origin=ORIGIN_WEB_PLAYER"
@@ -105,7 +105,7 @@ def download_snap_stories(snapchat_story_id):
 				log_seperator()
 				log_info_blue("Downloading a total of {:d} stories..".format(len(response_json.get("story").get("snaps"))))
 				log_seperator()
-				for snap in response_json.get("story").get("snaps"):
+				for index, snap in enumerate(response_json.get("story").get("snaps")):
 					media_type = snap.get("media").get("type")
 					media_url = snap.get("media").get("mediaUrl")
 					media_ts = snap.get("captureTimeSecs")
@@ -127,9 +127,9 @@ def download_snap_stories(snapchat_story_id):
 						elif download_result == True:
 							downloaded_in_iteration = True
 							stories_video += 1
-							log_info_green("Downloaded video: {:s} \033[93m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], (stories_image + stories_video), len(response_json.get("story").get("snaps"))))
+							log_info_green("Grabbed video: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("story").get("snaps"))))
 						else:
-							log_info_blue("Already exists: {:s} \033[93m(video)".format(download_path_with_file.split('/')[-1]))
+							log_info_blue("Skipped video: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("story").get("snaps"))))
 
 					if "IMAGE" in media_type:
 						download_path_with_file = os.path.join(download_path, "{:s}_media.jpg".format(media_id))
@@ -139,21 +139,21 @@ def download_snap_stories(snapchat_story_id):
 						elif download_result == True:
 							downloaded_in_iteration = True
 							stories_image += 1
-							log_info_green("Downloaded image: {:s} \033[93m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], (stories_image + stories_video), len(response_json.get("story").get("snaps"))))
+							log_info_green("Grabbed image: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("story").get("snaps"))))
 						else:
-							log_info_blue("Already exists: {:s} \033[93m(image)".format(download_path_with_file.split('/')[-1]))
+							log_info_blue("Skipped video: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("story").get("snaps"))))
 
 
 				log_seperator()
 				if stories_image and stories_video:
-					log_info_green("Successfully download {:d} images and {:d} videos.".format(stories_image, stories_video))
+					log_info_green("Finished downloading {:d} images and {:d} videos. (Excluding embedded files)".format(stories_image, stories_video))
 				elif stories_image:
-					log_info_green("Successfully download {:d} images.".format(stories_image))
+					log_info_green("Finished downloading {:d} images. (Excluding embedded files)".format(stories_image))
 				elif stories_video:
-					log_info_green("Successfully download {:d} videos.".format(stories_video))
+					log_info_green("Finished downloading {:d} videos. (Excluding embedded files)".format(stories_video))
 
 				else:
-					log_info_green("No new stories were downloaded.".format(stories_image, stories_video))
+					log_info_green("No new stories were downloaded. (Excluding embedded files)".format(stories_image, stories_video))
 				log_seperator()
 			else:
 				log_seperator()
@@ -162,7 +162,7 @@ def download_snap_stories(snapchat_story_id):
 				log_seperator()
 				exit(2)
 		else:
-			log_error("Could not make required directories. Eensure you have write permissions.")
+			log_error("Could not make required directories. Ensure you have write permissions.")
 			log_error("The script cannot continue, exiting.")
 			exit(1)
 	except Exception as e:
