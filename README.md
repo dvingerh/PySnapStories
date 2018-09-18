@@ -9,11 +9,20 @@ PySnapStories supports at least the following input formats:
 https://story.snapchat.com/s/loren (Username story)
 https://story.snapchat.com/s/s:0bU-rX4FRxqPG4o5QScoFA (Single user story)
 https://story.snapchat.com/s/c:LCfi6UdStalK_e-T5_WEK3jtBlY8js6KCOiJu_psBtsyHdrvG1KzpxvL8GG094H6ceU (Subject story)
-https://story.snapchat.com/s/m:q4_OINadScux6p1c6OgxRwAAEQtp2S0W_3UVaAWXqb9GaAWXqb838AAFRgA/ (single Map Event story)
+https://story.snapchat.com/s/m:q4_OINadScux6p1c6OgxRwAAEQtp2S0W_3UVaAWXqb9GaAWXqb838AAFRgA/ (Single Map Event story)
 https://play.snapchat.com/p:219c05b1bb1c710f (Map Event story)
 ```
 
 Entering an username only will also download all available stories. Most plain IDs as input are (probably) supported as well.
+
+Folder structure is as following:
+```
+root
+└───snapchat
+    └───StoryId_StoryTitle
+        └───embedded
+```
+For each user or other type of story a new folder will be created with the appropriate name. Inside this folder the stories will be downloaded with visual overlays removed when possible. The `embedded` folder contains the same stories but with the overlays untouched, just as you would see them on Snapchat.
 
 Example: `python3 pysnapstories.py https://story.snapchat.com/s/loren`
 
