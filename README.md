@@ -14,6 +14,7 @@ https://play.snapchat.com/p:219c05b1bb1c710f (Map Event story)
 ```
 
 Entering an username only will also download all available stories. Most plain IDs as input are (probably) supported as well.
+
 Be aware that only business account's stories are publicly visible and available for download. You will not be able to download any stories from regular accounts.
 
 Folder structure is as following:
