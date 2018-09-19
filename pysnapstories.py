@@ -33,53 +33,63 @@ def start():
 			snapchat_story_id = sys.argv[1].split('/')[-1]
 			if len(snapchat_story_id) > 15:
 				is_not_username = True
-				log_info_blue("Input detected as Event story.")
+				if "--verbose" in str(sys.argv):
+					log_info_blue("Input detected as Event story.")
 				snapchat_story_id = "p:" + snapchat_story_id
 			else:
 				log_info_blue("Input detected as Username.")
 		elif "story.snapchat.com/s/s:" in sys.argv[1]:
-			log_info_blue("Input detected as Single story.")
+			if "--verbose" in str(sys.argv):
+				log_info_blue("Input detected as Single story.")
 			snapchat_story_id = sys.argv[1].split('/')[-1]
 			is_not_username = True
 		elif "play.snapchat.com/p:" in sys.argv[1]:
-			log_info_blue("Input detected as Event story.")
+			if "--verbose" in str(sys.argv):
+				log_info_blue("Input detected as Event story.")
 			snapchat_story_id = sys.argv[1].split('/')[-1]
 			is_not_username = True
 		elif "map.snapchat.com/ttp/" in sys.argv[1]:
-			log_info_blue("Input detected as Map story.")
+			if "--verbose" in str(sys.argv):
+				log_info_blue("Input detected as Map story.")
 			snapchat_story_id = "m:" + sys.argv[1].split('/')[-2]
 			is_not_username = True
 		elif "map.snapchat.com/story/" in sys.argv[1]:
-			log_info_blue("Input detected as Map story.")
+			if "--verbose" in str(sys.argv):
+				log_info_blue("Input detected as Map story.")
 			snapchat_story_id = "p:" + sys.argv[1].split('/')[-1]
 			is_not_username = True
 		elif "play.snapchat.com/m:" in sys.argv[1]:
-			log_info_blue("Input detected as Single Map story.")
+			if "--verbose" in str(sys.argv):
+				log_info_blue("Input detected as Single Map story.")
 			snapchat_story_id = sys.argv[1].split('/')[-1]
 			is_not_username = True
 		else:
-			log_info_blue("Input detected as Username.")
+			if "--verbose" in str(sys.argv):
+				log_info_blue("Input detected as Username.")
 			snapchat_story_id = sys.argv[1]
 	except IndexError:
-		log_error("No argument was given, exiting.")
+		log_error("No input was given, exiting.")
 		log_seperator()
 		exit(1)
 
 	if not is_not_username:
 		log_info_green("Starting download for user: \033[93m{:s}".format(snapchat_story_id))
 	else:
-		log_info_green("Starting download for ID: \033[93m{:s}".format(snapchat_story_id))
-	log_seperator()
+		log_info_green("Starting download for Id: \033[93m{:s}".format(snapchat_story_id))
+	if "--verbose" in str(sys.argv):
+		log_seperator()
 	download_snap_stories(snapchat_story_id, is_not_username)
 
 
 def download_snap_stories(snapchat_story_id, is_not_username):
 	try:
-		log_info_blue("Waiting for JSON response from Snapchat..")
+		if "--verbose" in str(sys.argv):
+				log_info_blue("Waiting for JSON response from Snapchat..")
 		response = requests.get(story_json_base.format(snapchat_story_id), verify=True, headers={
 					"User-Agent"    : requests_ua["User-Agent"]
 				})
-		log_info_blue("Got JSON response, reading contents..")
+		if "--verbose" in str(sys.argv):
+				log_info_blue("Got JSON response, reading contents..")
 
 		if "rpc error: code = NotFound desc = Not found." in response.text:
 			log_seperator()
@@ -97,18 +107,20 @@ def download_snap_stories(snapchat_story_id, is_not_username):
 		stories_video = 0
 
 		snapchat_story_id = response_json.get("story").get("id", "NoId")
-		snapchat_story_name = slugify(response_json.get("story").get("metadata").get("title", "NoName"))
+		snapchat_story_name = response_json.get("story").get("metadata").get("title", "NoTitle")
 
-		download_path = os.getcwd() + "/snapchat/{}/".format('{:s}_{:s}'.format(snapchat_story_id, snapchat_story_name))
+		download_path = os.getcwd() + "/snapchat/{}/".format('{:s}_{:s}'.format(snapchat_story_id, slugify(snapchat_story_name)))
 		download_path_embedded = os.path.join(download_path, "embedded")
 		
 		if not os.path.exists(download_path_embedded):
 			os.makedirs(download_path_embedded)
 
-		if check_directories('{:s}_{:s}'.format(snapchat_story_id, snapchat_story_name)):
+		if check_directories('{:s}_{:s}'.format(snapchat_story_id, slugify(snapchat_story_name))):
 			if response_json.get("story").get("snaps"):
 				log_seperator()
-				log_info_blue("Amount of available stories: {:d}".format(len(response_json.get("story").get("snaps"))))
+				log_info_blue("Story Id     : {:s}".format(snapchat_story_id if snapchat_story_id != "NoId" else "Not available"))
+				log_info_blue("Story Title  : {:s}".format(snapchat_story_name if snapchat_story_name != "NoTitle" else "Not available"))
+				log_info_blue("Story amount : {:d}".format(len(response_json.get("story").get("snaps"))))
 				log_seperator()
 				for index, snap in enumerate(response_json.get("story").get("snaps")):
 					media_type = snap.get("media").get("type")
@@ -158,7 +170,7 @@ def download_snap_stories(snapchat_story_id, is_not_username):
 					log_info_green("Finished downloading {:d} video(s). (Excluding embedded files)".format(stories_video))
 
 				else:
-					log_info_green("No new stories were downloaded. (Excluding embedded files)".format(stories_image, stories_video))
+					log_info_green("No new stories have been downloaded. (Excluding embedded files)".format(stories_image, stories_video))
 				log_seperator()
 			else:
 				log_seperator()
