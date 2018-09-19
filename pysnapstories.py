@@ -27,6 +27,8 @@ def start():
 	log_seperator()
 
 	is_not_username = False
+	if sys.argv[1].endswith("/"):
+		sys.argv[1] = sys.argv[:-1]
 
 	try:
 		if ("story.snapchat.com/s/" in sys.argv[1]) and ("/s:" not in sys.argv[1]):
