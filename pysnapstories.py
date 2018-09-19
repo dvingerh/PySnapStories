@@ -15,7 +15,7 @@ except ImportError:
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
 sep = "-" * 95
-script_version = "1.1"
+script_version = "1.2"
 python_version = sys.version.split(' ')[0]
 requests_ua = {'User-Agent': "Mozilla/5.0 (Windows NT 5.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36"}
 story_json_base = "https://storysharing.snapchat.com/v1/fetch/{}?request_origin=ORIGIN_WEB_PLAYER"
@@ -33,7 +33,8 @@ def start():
 			snapchat_story_id = sys.argv[1].split('/')[-1]
 			if len(snapchat_story_id) > 15:
 				is_not_username = True
-				log_info_blue("Input detected as Story ID.")
+				log_info_blue("Input detected as Event story.")
+				snapchat_story_id = "p:" + snapchat_story_id
 			else:
 				log_info_blue("Input detected as Username.")
 		elif "story.snapchat.com/s/s:" in sys.argv[1]:
@@ -69,20 +70,23 @@ def start():
 	else:
 		log_info_green("Starting download for ID: \033[93m{:s}".format(snapchat_story_id))
 	log_seperator()
-	download_snap_stories(snapchat_story_id)
+	download_snap_stories(snapchat_story_id, is_not_username)
 
 
-def download_snap_stories(snapchat_story_id):
+def download_snap_stories(snapchat_story_id, is_not_username):
 	try:
-		log_info_blue("Waiting for JSON response request..")
+		log_info_blue("Waiting for JSON response from Snapchat..")
 		response = requests.get(story_json_base.format(snapchat_story_id), verify=True, headers={
 					"User-Agent"    : requests_ua["User-Agent"]
 				})
-		log_info_blue("Got response, reading contents..")
+		log_info_blue("Got JSON response, reading contents..")
 
 		if "rpc error: code = NotFound desc = Not found." in response.text:
 			log_seperator()
-			log_error("This username does not belong to a business account.")
+			if is_not_username:
+				log_error("This story is not valid or is no longer available.")
+			else:
+				log_error("This username does not belong to an officially verified account.")
 			log_error("The script cannot continue, exiting.")
 			log_seperator()
 			exit(1)
