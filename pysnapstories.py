@@ -29,27 +29,28 @@ def start():
 	is_not_username = False
 
 	try:
-		if (".snapchat.com/s/" in sys.argv[1]) and ("/s:" not in sys.argv[1]):
-			if len(sys.argv[1].split('/')[-1]) < 1:
-				snapchat_story_id = sys.argv[1].split('/')[-2]
-			else:
-				snapchat_story_id = sys.argv[1].split('/')[-1]
+		if ("story.snapchat.com/s/" in sys.argv[1]) and ("/s:" not in sys.argv[1]):
+			snapchat_story_id = sys.argv[1].split('/')[-1]
 			if len(snapchat_story_id) > 15:
 				is_not_username = True
 				log_info_blue("Input detected as Story ID.")
 			else:
 				log_info_blue("Input detected as Username.")
-		elif ".snapchat.com/s/s:" in sys.argv[1]:
+		elif "story.snapchat.com/s/s:" in sys.argv[1]:
 			log_info_blue("Input detected as Single story.")
 			snapchat_story_id = sys.argv[1].split('/')[-1]
 			is_not_username = True
-		elif ".snapchat.com/p:" in sys.argv[1]:
+		elif "play.snapchat.com/p:" in sys.argv[1]:
 			log_info_blue("Input detected as Event story.")
 			snapchat_story_id = sys.argv[1].split('/')[-1]
 			is_not_username = True
 		elif "map.snapchat.com/ttp/" in sys.argv[1]:
 			log_info_blue("Input detected as Map story.")
 			snapchat_story_id = "m:" + sys.argv[1].split('/')[-2]
+			is_not_username = True
+		elif "map.snapchat.com/story/" in sys.argv[1]:
+			log_info_blue("Input detected as Map story.")
+			snapchat_story_id = "p:" + sys.argv[1].split('/')[-1]
 			is_not_username = True
 		elif "play.snapchat.com/m:" in sys.argv[1]:
 			log_info_blue("Input detected as Single Map story.")
@@ -103,7 +104,7 @@ def download_snap_stories(snapchat_story_id):
 		if check_directories('{:s}_{:s}'.format(snapchat_story_id, snapchat_story_name)):
 			if response_json.get("story").get("snaps"):
 				log_seperator()
-				log_info_blue("Downloading a total of {:d} stories..".format(len(response_json.get("story").get("snaps"))))
+				log_info_blue("Amount of available stories: {:d}".format(len(response_json.get("story").get("snaps"))))
 				log_seperator()
 				for index, snap in enumerate(response_json.get("story").get("snaps")):
 					media_type = snap.get("media").get("type")
@@ -146,11 +147,11 @@ def download_snap_stories(snapchat_story_id):
 
 				log_seperator()
 				if stories_image and stories_video:
-					log_info_green("Finished downloading {:d} images and {:d} videos. (Excluding embedded files)".format(stories_image, stories_video))
+					log_info_green("Finished downloading {:d} image(s) and {:d} video(s). (Excluding embedded files)".format(stories_image, stories_video))
 				elif stories_image:
-					log_info_green("Finished downloading {:d} images. (Excluding embedded files)".format(stories_image))
+					log_info_green("Finished downloading {:d} image(s). (Excluding embedded files)".format(stories_image))
 				elif stories_video:
-					log_info_green("Finished downloading {:d} videos. (Excluding embedded files)".format(stories_video))
+					log_info_green("Finished downloading {:d} video(s). (Excluding embedded files)".format(stories_video))
 
 				else:
 					log_info_green("No new stories were downloaded. (Excluding embedded files)".format(stories_image, stories_video))
