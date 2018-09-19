@@ -15,7 +15,7 @@ except ImportError:
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
 sep = "-" * 95
-script_version = "1.2"
+script_version = "1.3"
 python_version = sys.version.split(' ')[0]
 requests_ua = {'User-Agent': "Mozilla/5.0 (Windows NT 5.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36"}
 story_json_base = "https://storysharing.snapchat.com/v1/fetch/{}?request_origin=ORIGIN_WEB_PLAYER"
@@ -35,7 +35,8 @@ def start():
 				is_not_username = True
 				if "--verbose" in str(sys.argv):
 					log_info_blue("Input detected as Event story.")
-				snapchat_story_id = "p:" + snapchat_story_id
+				if "/c:" not in sys.argv[1]:
+					snapchat_story_id = "p:" + snapchat_story_id
 			else:
 				log_info_blue("Input detected as Username.")
 		elif "story.snapchat.com/s/s:" in sys.argv[1]:
@@ -158,7 +159,7 @@ def download_snap_stories(snapchat_story_id, is_not_username):
 							stories_image += 1
 							log_info_green("Grabbed image: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("story").get("snaps"))))
 						else:
-							log_info_blue("Skipped video: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("story").get("snaps"))))
+							log_info_blue("Skipped image: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("story").get("snaps"))))
 
 
 				log_seperator()
