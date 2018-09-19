@@ -3,6 +3,8 @@ A Python script to download public Snapchat user stories and events.
 
 # How to use
 
+Go to https://story.snapchat.com/ and search for Snapchat stories you wish to download.
+
 PySnapStories supports at least the following input formats:
 
 ```
