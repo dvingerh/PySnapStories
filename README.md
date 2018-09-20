@@ -35,26 +35,23 @@ Example: `python3 pysnapstories.py https://story.snapchat.com/s/loren`
 ```
 > python3 pysnapstories.py loren
 -----------------------------------------------------------------------------------------------
-[I] PYSNAPSTORIES (SCRIPT V1.1 - PYTHON V3.6.4) - 11:46:36 PM
+[I] PYSNAPSTORIES (SCRIPT V1.3 - PYTHON V3.6.4) - 12:20:17 PM                                  
 -----------------------------------------------------------------------------------------------
-[I] Input detected as Username.
-[I] Starting download for user: loren
+[I] Starting download for user: loren                                                          
 -----------------------------------------------------------------------------------------------
-[I] Waiting for JSON response request..
-[I] Got response, reading contents..
+[I] Story Id     : loren                                                                       
+[I] Story Title  : Loren Gray                                                                  
+[I] Story amount : 8                                                                           
 -----------------------------------------------------------------------------------------------
-[I] Downloading a total of 9 stories..
+[I] Skipped video: iqGdye5oT8ylxcSlAVW3BwAAAbWnYjQtiHBRKAWXynQ_aAWXynQfaAAFRgA_media.mp4 (1/8) 
+[I] Skipped image: iqGdye5oT8ylxcSlAVW3BwAAAtrENNhmxp4vAAWXyncNjAWXynb_aAAFRgA_media.jpg (2/8) 
+[I] Skipped video: iqGdye5oT8ylxcSlAVW3BwAAAXc0wjfUWucIhAWXyqUNqAWXyqPZIAAFRgA_media.mp4 (3/8) 
+[I] Skipped video: iqGdye5oT8ylxcSlAVW3BwAAAnbN0gxdDlXBVAWXyrlijAWXyrXZiAAFRgA_media.mp4 (4/8) 
+[I] Grabbed video: iqGdye5oT8ylxcSlAVW3BwAAAXnYNmXp24BuvAWXzKTirAWXzKR0FAAFRgA_media.mp4 (5/8) 
+[I] Grabbed image: iqGdye5oT8ylxcSlAVW3BwAAA3mBWgobzU_PcAWXzyBXSAWXzyBToAAFRgA_media.jpg (6/8) 
+[I] Grabbed image: iqGdye5oT8ylxcSlAVW3BwAAAIx70L2O3uDq_AWX0F8bsAWX0F8MzAAFRgA_media.jpg (7/8) 
+[I] Grabbed video: iqGdye5oT8ylxcSlAVW3BwAAAV4B4ssbnv_HEAWX0__dRAWX0_3z9AAFRgA_media.mp4 (8/8) 
 -----------------------------------------------------------------------------------------------
-[I] Skipped video: iqGdye5oT8ylxcSlAVW3BwAAAdDFLCvA96UlRAWXqWLEIAWXqWJ-gAAFRgA_media.mp4 (1/9)
-[I] Skipped video: iqGdye5oT8ylxcSlAVW3BwAAA7vlgtjaFT28xAWXqWK3OAWXqWJ_FAAFRgA_media.mp4 (2/9)
-[I] Skipped video: iqGdye5oT8ylxcSlAVW3BwAAA6_ItSBUTY4h7AWXqXH8mAWXqXHklAAFRgA_media.mp4 (3/9)
-[I] Skipped video: iqGdye5oT8ylxcSlAVW3BwAAAdi2EJaUmc3JwAWXtd-C6AWXtd9-YAAFRgA_media.jpg (4/9)
-[I] Grabbed image: iqGdye5oT8ylxcSlAVW3BwAAAobqNM15eGJviAWXth8sBAWXth8cUAAFRgA_media.jpg (5/9)
-[I] Grabbed video: iqGdye5oT8ylxcSlAVW3BwAAAFp_e6Qf31clAAWXt124rAWXt11_1AAFRgA_media.mp4 (6/9)
-[I] Grabbed video: iqGdye5oT8ylxcSlAVW3BwAAAn94lRd2mye8zAWXt20-4AWXt2lCdAAFRgA_media.mp4 (7/9)
-[I] Skipped video: iqGdye5oT8ylxcSlAVW3BwAAAd4ClQhHN8TOtAWXt57CWAWXt55DtAAFRgA_media.mp4 (8/9)
-[I] Grabbed image: iqGdye5oT8ylxcSlAVW3BwAAAN0jUGs_xpFAIAWXuMavjAWXuMZk-AAFRgA_media.jpg (9/9)
------------------------------------------------------------------------------------------------
-[I] Finished downloading 2 images and 2 videos. (Excluding embedded files)
+[I] Finished downloading 2 image(s) and 2 video(s). (Excluding embedded files)                 
 -----------------------------------------------------------------------------------------------
 ```
