@@ -21,14 +21,14 @@ Be aware that only officially verified Snapchat accounts are publicly visible an
 
 Folder structure is as following:
 ```
-root
+pysnapstories.py
 └───snapchat
     └───StoryId_StoryTitle
         └───embedded
 ```
 For each user or other type of story a new folder will be created with the appropriate name. Inside this folder the stories will be downloaded with visual overlays removed when possible. The `embedded` folder contains the same stories but with the overlays untouched, just as you would see them on Snapchat.
 
-Example: `python3 pysnapstories.py https://story.snapchat.com/s/loren`
+Example: `python3 pysnapstories.py loren`
 
 ### Example
 
