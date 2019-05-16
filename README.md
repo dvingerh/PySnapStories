@@ -1,3 +1,11 @@
+# No longer maintained
+Recently Snapchat removed stories from their web endpoint, rendering this script useless.  
+No further updates will be made to this script unless Snapchat adds back story viewing in the browser again.
+
+#
+#
+#
+
 # PySnapStories
 A Python script to download public Snapchat user stories and events.
 
