@@ -1,5 +1,5 @@
 # PySnapStories
-A Python script to download public Snapchat user stories from verified accounts.
+A Python script to download public Snapchat user stories from verified accounts, subjects and Map events.
 
 # How to use
 
