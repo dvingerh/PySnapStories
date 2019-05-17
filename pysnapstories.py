@@ -6,6 +6,7 @@ import os
 import time
 import re
 import shutil
+import warnings
 
 try:
 	import urllib.request as urllib
@@ -15,91 +16,174 @@ except ImportError:
 requests.packages.urllib3.disable_warnings(InsecureRequestWarning)
 ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
 sep = "-" * 95
-script_version = "1.3"
+script_version = "2.0"
 python_version = sys.version.split(' ')[0]
 requests_ua = {'User-Agent': "Mozilla/5.0 (Windows NT 5.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36"}
-story_json_base = "https://storysharing.snapchat.com/v1/fetch/{}?request_origin=ORIGIN_WEB_PLAYER"
 
+story_endpoints = {
+	"mapStory": "https://storysharing.snapchat.com/v1/fetch/{}",
+	"subjectOrUserStory": "https://search.snapchat.com/lookupStory?id={}",
+}
+
+story_type = ""
+
+story_endpoint_final = ""
+warnings.filterwarnings("ignore", category=DeprecationWarning)
 
 def start():
+	global story_endpoint_final
 	log_seperator()
 	log_info_blue('PYSNAPSTORIES (SCRIPT V{:s} - PYTHON V{:s}) - {:s}'.format(script_version, python_version, time.strftime('%I:%M:%S %p')))
 	log_seperator()
 
 	is_not_username = False
-	if sys.argv[1].endswith("/"):
-		sys.argv[1] = sys.argv[:-1]
 
+	given_input = sys.argv[1].replace("/", "")
 	try:
-		if ("story.snapchat.com/s/" in sys.argv[1]) and ("/s:" not in sys.argv[1]):
-			snapchat_story_id = sys.argv[1].split('/')[-1]
-			if len(snapchat_story_id) > 15:
-				is_not_username = True
-				if "--verbose" in str(sys.argv):
-					log_info_blue("Input detected as Event story.")
-				if "/c:" not in sys.argv[1]:
-					snapchat_story_id = "p:" + snapchat_story_id
-			else:
-				log_info_blue("Input detected as Username.")
-		elif "story.snapchat.com/s/s:" in sys.argv[1]:
-			if "--verbose" in str(sys.argv):
-				log_info_blue("Input detected as Single story.")
-			snapchat_story_id = sys.argv[1].split('/')[-1]
+		if given_input.startswith("p:"):
 			is_not_username = True
-		elif "play.snapchat.com/p:" in sys.argv[1]:
-			if "--verbose" in str(sys.argv):
-				log_info_blue("Input detected as Event story.")
-			snapchat_story_id = sys.argv[1].split('/')[-1]
+			log_info_blue("Treating input as multiple map story.")
+			story_endpoint_final = story_endpoints.get("mapStory")
+			story_type = "MAPMULTI"
+		elif given_input.startswith("m:"):
 			is_not_username = True
-		elif "map.snapchat.com/ttp/" in sys.argv[1]:
-			if "--verbose" in str(sys.argv):
-				log_info_blue("Input detected as Map story.")
-			snapchat_story_id = "m:" + sys.argv[1].split('/')[-2]
+			log_info_blue("Treating input as single map story.")
+			story_endpoint_final = story_endpoints.get("mapStory")
+			story_type = "MAPSINGLE"
+		elif given_input.startswith("c:"):
 			is_not_username = True
-		elif "map.snapchat.com/story/" in sys.argv[1]:
-			if "--verbose" in str(sys.argv):
-				log_info_blue("Input detected as Map story.")
-			snapchat_story_id = "p:" + sys.argv[1].split('/')[-1]
-			is_not_username = True
-		elif "play.snapchat.com/m:" in sys.argv[1]:
-			if "--verbose" in str(sys.argv):
-				log_info_blue("Input detected as Single Map story.")
-			snapchat_story_id = sys.argv[1].split('/')[-1]
-			is_not_username = True
+			log_info_blue("Treating input as subject story.")
+			story_endpoint_final = story_endpoints.get("subjectOrUserStory")	
+			story_type = "SUBJECT"
 		else:
-			if "--verbose" in str(sys.argv):
-				log_info_blue("Input detected as Username.")
-			snapchat_story_id = sys.argv[1]
+			log_info_blue("Treating input as username (no ID was detected).")
+			story_endpoint_final = story_endpoints.get("subjectOrUserStory")
+			story_type = "USERNAME"
 	except IndexError:
 		log_error("No input was given, exiting.")
 		log_seperator()
 		exit(1)
 
-	if not is_not_username:
-		log_info_green("Starting download for user: \033[93m{:s}".format(snapchat_story_id))
-	else:
-		log_info_green("Starting download for Id: \033[93m{:s}".format(snapchat_story_id))
-	if "--verbose" in str(sys.argv):
-		log_seperator()
-	download_snap_stories(snapchat_story_id, is_not_username)
+
+	if story_type == "MAPMULTI":
+		log_info_green("Starting download for multiple map story ID: \033[93m{:s}".format(given_input))
+		download_map_stories(given_input)
+	elif story_type == "MAPSINGLE":
+		log_info_green("Starting download for single map story ID: \033[93m{:s}".format(given_input))
+		download_map_stories(given_input)
+	elif story_type == "SUBJECT":
+		log_info_green("Starting download for subject story ID: \033[93m{:s}".format(given_input))
+		download_subject_user_stories(given_input)
+	elif story_type == "USERNAME":
+		log_info_green("Starting download for user: \033[93m{:s}".format(given_input))
+		download_subject_user_stories(given_input)
 
 
-def download_snap_stories(snapchat_story_id, is_not_username):
+def download_subject_user_stories(snapchat_story_id):
 	try:
-		if "--verbose" in str(sys.argv):
-				log_info_blue("Waiting for JSON response from Snapchat..")
-		response = requests.get(story_json_base.format(snapchat_story_id), verify=True, headers={
+		response = requests.get(story_endpoint_final.format(snapchat_story_id), verify=True, headers={"User-Agent"    : requests_ua["User-Agent"]})
+		response_json = json.loads(response.text)
+
+		stories_image = 0
+		stories_video = 0
+
+		snapchat_story_id = slugify(sys.argv[1])
+		snapchat_story_name = slugify(response_json.get("storyTitle", "NoTitle"))
+
+		download_path = os.getcwd() + "/snapchat/{}/".format('{:s}_{:s}'.format(snapchat_story_id, snapchat_story_name))
+		download_path_overlay = os.path.join(download_path, "overlay")
+		
+		if not os.path.exists(download_path_overlay):
+			os.makedirs(download_path_overlay)
+
+		if check_directories('{:s}_{:s}'.format(snapchat_story_id, snapchat_story_name)):
+			if response_json.get("snapList"):
+				log_seperator()
+				log_info_blue("Story Id     : {:s}".format(snapchat_story_id if snapchat_story_id != "NoId" else "Not available"))
+				log_info_blue("Story Title  : {:s}".format(snapchat_story_name if snapchat_story_name != "NoTitle" else "Not available"))
+				log_info_blue("Story amount : {:d}".format(len(response_json.get("snapList"))))
+				log_seperator()
+				for index, snap in enumerate(response_json.get("snapList")):
+					media_url = snap.get("snapUrls").get("mediaUrl")
+					media_overlay_url = snap.get("snapUrls").get("overlayUrl")
+					media_type = "VIDEO" if ".mp4" in media_url else "IMAGE"
+					media_ts = snap.get("timestampInSec")
+					media_id = snap.get("snapId")
+
+					downloaded_in_iteration = False
+
+
+					if "VIDEO" in media_type:
+						if media_overlay_url:
+							download_path_with_file = os.path.join(download_path_overlay, "{:s}_overlay.png".format(media_id))
+							download_result =  download_story(media_overlay_url, download_path_with_file, is_overlay=True)
+							if download_result == "Error":
+								pass
+							elif download_result == True:
+								log_info_green("Grabbed other: \033[92m{:s}\033[0m".format("{:s}_overlay.png".format(media_id)))
+							else:
+								log_info_blue("Skipped other: \033[92m{:s}\033[0m".format("{:s}_overlay.png".format(media_id)))
+							
+
+						download_path_with_file = os.path.join(download_path, "{:s}_media.mp4".format(media_id))
+						download_result =  download_story(media_url.replace("overlay", "media"), download_path_with_file)
+						if download_result == "Error":
+							pass
+						elif download_result == True:
+							downloaded_in_iteration = True
+							stories_video += 1
+							log_info_green("Grabbed video: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("snapList"))))
+						else:
+							log_info_blue("Skipped video: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("snapList"))))
+
+					if "IMAGE" in media_type:
+						download_path_with_file = os.path.join(download_path, "{:s}_media.jpg".format(media_id))
+						download_result =  download_story(media_url, download_path_with_file)
+						if download_result == "Error":
+							pass
+						elif download_result == True:
+							downloaded_in_iteration = True
+							stories_image += 1
+							log_info_green("Grabbed image: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("snapList"))))
+						else:
+							log_info_blue("Skipped image: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("snapList"))))
+
+
+				log_seperator()
+				if stories_image and stories_video:
+					log_info_green("Finished downloading {:d} image(s) and {:d} video(s).".format(stories_image, stories_video))
+				elif stories_image:
+					log_info_green("Finished downloading {:d} image(s).".format(stories_image))
+				elif stories_video:
+					log_info_green("Finished downloading {:d} video(s).".format(stories_video))
+
+				else:
+					log_info_green("No new stories have been downloaded.".format(stories_image, stories_video))
+				log_seperator()
+			else:
+				log_seperator()
+				log_warn("There are no stories available to download.")
+				shutil.rmtree(download_path)
+				log_seperator()
+				exit(2)
+		else:
+			log_error("Could not make required directories. Ensure you have write permissions.")
+			log_error("The script cannot continue, exiting.")
+			exit(1)
+	except Exception as e:
+		log_error("Something went wrong: {:s}".format(str(e)))
+		log_error("The script cannot continue, exiting.")
+		exit(1)
+
+def download_map_stories(snapchat_story_id):
+	try:
+
+		response = requests.get(story_endpoint_final.format(snapchat_story_id), verify=True, headers={
 					"User-Agent"    : requests_ua["User-Agent"]
 				})
-		if "--verbose" in str(sys.argv):
-				log_info_blue("Got JSON response, reading contents..")
 
 		if "rpc error: code = NotFound desc = Not found." in response.text:
-			log_seperator()
-			if is_not_username:
-				log_error("This story is not valid or is no longer available.")
-			else:
-				log_error("This username does not belong to an officially verified account.")
+			log_error("This username does not belong to an officially verified account.")
 			log_error("The script cannot continue, exiting.")
 			log_seperator()
 			exit(1)
@@ -109,16 +193,16 @@ def download_snap_stories(snapchat_story_id, is_not_username):
 		stories_image = 0
 		stories_video = 0
 
-		snapchat_story_id = response_json.get("story").get("id", "NoId")
-		snapchat_story_name = response_json.get("story").get("metadata").get("title", "NoTitle")
+		snapchat_story_id = slugify(response_json.get("story").get("id", "NoId"))
+		snapchat_story_name = slugify(response_json.get("story").get("metadata").get("title", "NoTitle"))
 
-		download_path = os.getcwd() + "/snapchat/{}/".format('{:s}_{:s}'.format(snapchat_story_id, slugify(snapchat_story_name)))
+		download_path = os.getcwd() + "/snapchat/{}/".format('{:s}_{:s}'.format(snapchat_story_id, snapchat_story_name))
 		download_path_embedded = os.path.join(download_path, "embedded")
 		
 		if not os.path.exists(download_path_embedded):
 			os.makedirs(download_path_embedded)
 
-		if check_directories('{:s}_{:s}'.format(snapchat_story_id, slugify(snapchat_story_name))):
+		if check_directories('{:s}_{:s}'.format(snapchat_story_id, snapchat_story_name)):
 			if response_json.get("story").get("snaps"):
 				log_seperator()
 				log_info_blue("Story Id     : {:s}".format(snapchat_story_id if snapchat_story_id != "NoId" else "Not available"))
@@ -190,9 +274,7 @@ def download_snap_stories(snapchat_story_id, is_not_username):
 		log_error("The script cannot continue, exiting.")
 		exit(1)
 
-
-
-def download_story(media_url, save_path):
+def download_story(media_url, save_path, is_overlay=False):
 	if not os.path.exists(save_path):
 		try:
 			urllib.URLopener().retrieve(media_url, save_path)
@@ -311,7 +393,7 @@ def slugify(s):
 
 	s.lower()
 
-	for c in [' ', '-', '.', '/']:
+	for c in [' ', '-', '.', '/', ':', '<', '>', '?', '|', '*', '"', '\\', '\'']:
 		s = s.replace(c, '_')
 
 	s = re.sub('\W', '', s)

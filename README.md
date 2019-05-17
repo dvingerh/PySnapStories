@@ -1,31 +1,22 @@
-# No longer maintained
-Recently Snapchat removed stories from their web endpoint, rendering this script useless.  
-No further updates will be made to this script unless Snapchat adds back story viewing in the browser again.
-
-#
-#
-#
-
 # PySnapStories
-A Python script to download public Snapchat user stories and events.
+A Python script to download public Snapchat user stories from verified accounts.
 
 # How to use
 
 Go to https://story.snapchat.com/ and search for Snapchat stories you wish to download.
 
-PySnapStories supports at least the following input formats:
+PySnapStories supports the following input formats:
 
 ```
-https://story.snapchat.com/s/loren (Username story)
-https://story.snapchat.com/s/s:0bU-rX4FRxqPG4o5QScoFA (Single user story)
-https://story.snapchat.com/s/c:LCfi6UdStalK_e-T5_WEK3jtBlY8js6KCOiJu_psBtsyHdrvG1KzpxvL8GG094H6ceU (Subject story)
-https://story.snapchat.com/s/m:q4_OINadScux6p1c6OgxRwAAEQtp2S0W_3UVaAWXqb9GaAWXqb838AAFRgA/ (Single Map Event story)
-https://play.snapchat.com/p:219c05b1bb1c710f (Map Event story)
+loren (Username story)
+c:LCfi6UdStalK_e-T5_WEK3jtBlY8js6KCOiJu_psBtsyHdrvG1KzpxvL8GG094H6ceU (Subject story)
+m:q4_OINadScux6p1c6OgxRwAAEQtp2S0W_3UVaAWXqb9GaAWXqb838AAFRgA/ (Single Map Event story)
+p:219c05b1bb1c710f (Map Event story)
 ```
 
-Entering an username only will also download all available stories. Most plain IDs as input are (probably) supported as well.
+You can obtain the above IDs through the Share function in the Snapchat web client: https://map.snapchat.com/
 
-Be aware that only officially verified Snapchat accounts are publicly visible and available for download. You will not be able to download any stories from regular accounts.
+Be aware that with usernames, only officially verified Snapchat accounts are publicly visible and available for download. You will not be able to download any stories from regular accounts.
 
 Folder structure is as following:
 ```
@@ -33,8 +24,12 @@ pysnapstories.py
 └───snapchat
     └───StoryId_StoryTitle
         └───embedded
+        └───overlay
 ```
-For each user or other type of story a new folder will be created with the appropriate name. Inside this folder the stories will be downloaded with visual overlays removed when possible. The `embedded` folder contains the same stories but with the overlays untouched, just as you would see them on Snapchat.
+For each user or other type of story a new folder will be created with the appropriate name.  
+Inside this folder the stories will be downloaded with visual overlays removed when possible.  
+The `embedded` folder contains the same stories but with the overlays untouched, just as you would see them on Snapchat.  
+When downloading usernames, an `overlay` folder will be created containing saved overlays whenever they are detected on Snapchat stories.
 
 Example: `python3 pysnapstories.py loren`
 
