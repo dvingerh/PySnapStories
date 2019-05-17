@@ -31,8 +31,6 @@ Inside this folder the stories will be downloaded with visual overlays removed w
 The `embedded` folder contains the same stories but with the overlays untouched, just as you would see them on Snapchat.  
 When downloading usernames, an `overlay` folder will be created containing saved overlays whenever they are detected on Snapchat stories.
 
-Example: `python3 pysnapstories.py loren`
-
 ### Example
 
 ```
