@@ -56,7 +56,7 @@ def start():
 			story_endpoint_final = story_endpoints.get("subjectOrUserStory")	
 			story_type = "SUBJECT"
 		else:
-			log_info_blue("Treating input as username (no ID was detected).")
+			log_info_blue("Treating input as username. (no ID was detected)")
 			story_endpoint_final = story_endpoints.get("subjectOrUserStory")
 			story_type = "USERNAME"
 	except IndexError:
@@ -82,7 +82,13 @@ def start():
 def download_subject_user_stories(snapchat_story_id):
 	try:
 		response = requests.get(story_endpoint_final.format(snapchat_story_id), verify=True, headers={"User-Agent"    : requests_ua["User-Agent"]})
-		response_json = json.loads(response.text)
+		try:
+			response_json = json.loads(response.text)
+		except ValueError:
+			log_error("The given username did not return any stories.")
+			log_error("The script cannot continue, exiting.")
+			log_seperator()
+			exit(1)
 
 		stories_image = 0
 		stories_video = 0
@@ -183,7 +189,7 @@ def download_map_stories(snapchat_story_id):
 				})
 
 		if "rpc error: code = NotFound desc = Not found." in response.text:
-			log_error("This username does not belong to an officially verified account.")
+			log_error("The given ID did not return any stories.")
 			log_error("The script cannot continue, exiting.")
 			log_seperator()
 			exit(1)
