@@ -85,6 +85,7 @@ def download_subject_user_stories(snapchat_story_id):
 		try:
 			response_json = json.loads(response.text)
 		except ValueError:
+			log_seperator()
 			log_error("The given username did not return any stories.")
 			log_error("The script cannot continue, exiting.")
 			log_seperator()
@@ -173,10 +174,12 @@ def download_subject_user_stories(snapchat_story_id):
 				log_seperator()
 				exit(2)
 		else:
+			log_seperator()
 			log_error("Could not make required directories. Ensure you have write permissions.")
 			log_error("The script cannot continue, exiting.")
 			exit(1)
 	except Exception as e:
+		log_seperator()
 		log_error("Something went wrong: {:s}".format(str(e)))
 		log_error("The script cannot continue, exiting.")
 		exit(1)
@@ -189,6 +192,7 @@ def download_map_stories(snapchat_story_id):
 				})
 
 		if "rpc error: code = NotFound desc = Not found." in response.text:
+			log_seperator()
 			log_error("The given ID did not return any stories.")
 			log_error("The script cannot continue, exiting.")
 			log_seperator()
