@@ -1,3 +1,6 @@
+# Notice
+Snapchat is constantly changing how their backend returns information (for the worse), so consider this script deprecated and not usable.
+
 # PySnapStories
 A Python script to download public Snapchat user stories from verified accounts, subjects and Map events.
 
