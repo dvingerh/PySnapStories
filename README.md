@@ -1,5 +1,5 @@
 # Notice
-Snapchat is constantly changing how their backend returns information (for the worse), so consider this script deprecated and not usable.
+Snapchat is constantly changing how their backend returns information (for the worse). The script may stop working at any time and no updates are guaranteed.
 
 # PySnapStories
 A Python script to download public Snapchat user stories from verified accounts, subjects and Map events.
@@ -39,23 +39,24 @@ When downloading usernames, an `overlay` folder will be created containing saved
 ```
 > python3 pysnapstories.py loren
 -----------------------------------------------------------------------------------------------
-[I] PYSNAPSTORIES (SCRIPT V1.3 - PYTHON V3.6.4) - 12:20:17 PM                                  
+[I] PYSNAPSTORIES (SCRIPT V2.0 - PYTHON V3.7.3) - 07:15:11 PM
 -----------------------------------------------------------------------------------------------
-[I] Starting download for user: loren                                                          
+[I] Treating input as username. (no ID was detected)
+[I] Starting download for user: loren
 -----------------------------------------------------------------------------------------------
-[I] Story Id     : loren                                                                       
-[I] Story Title  : Loren Gray                                                                  
-[I] Story amount : 8                                                                           
+[I] Story Id     : loren
+[I] Story Title  : Loren Gray
+[I] Story amount : 8
 -----------------------------------------------------------------------------------------------
-[I] Skipped video: iqGdye5oT8ylxcSlAVW3BwAAAbWnYjQtiHBRKAWXynQ_aAWXynQfaAAFRgA_media.mp4 (1/8) 
-[I] Skipped image: iqGdye5oT8ylxcSlAVW3BwAAAtrENNhmxp4vAAWXyncNjAWXynb_aAAFRgA_media.jpg (2/8) 
-[I] Skipped video: iqGdye5oT8ylxcSlAVW3BwAAAXc0wjfUWucIhAWXyqUNqAWXyqPZIAAFRgA_media.mp4 (3/8) 
-[I] Skipped video: iqGdye5oT8ylxcSlAVW3BwAAAnbN0gxdDlXBVAWXyrlijAWXyrXZiAAFRgA_media.mp4 (4/8) 
-[I] Grabbed video: iqGdye5oT8ylxcSlAVW3BwAAAXnYNmXp24BuvAWXzKTirAWXzKR0FAAFRgA_media.mp4 (5/8) 
-[I] Grabbed image: iqGdye5oT8ylxcSlAVW3BwAAA3mBWgobzU_PcAWXzyBXSAWXzyBToAAFRgA_media.jpg (6/8) 
-[I] Grabbed image: iqGdye5oT8ylxcSlAVW3BwAAAIx70L2O3uDq_AWX0F8bsAWX0F8MzAAFRgA_media.jpg (7/8) 
-[I] Grabbed video: iqGdye5oT8ylxcSlAVW3BwAAAV4B4ssbnv_HEAWX0__dRAWX0_3z9AAFRgA_media.mp4 (8/8) 
+[I] Grabbed video: iqGdye5oT8ylxcSlAVW3BwAAgVEPGUQK2HA6eAWxZR_PWAWxY7GSo_____w_media.mp4 (1/8)
+[I] Grabbed video: iqGdye5oT8ylxcSlAVW3BwAAg9V5xSA3j4u4wAWxZqP-dAWxZqPkT_____w_media.mp4 (2/8)
+[I] Grabbed image: iqGdye5oT8ylxcSlAVW3BwAAg9XpmNpYLjEecAWxapW7-AWxZwjTI_____w_media.jpg (3/8)
+[I] Grabbed image: iqGdye5oT8ylxcSlAVW3BwAAgSmP4GN5-QRFhAWxZ6KzWAWxZwo47_____w_media.jpg (4/8)
+[I] Grabbed video: iqGdye5oT8ylxcSlAVW3BwAAgCWU7JUt7_EycAWxZyBzrAWxZwxq7_____w_media.mp4 (5/8)
+[I] Grabbed image: iqGdye5oT8ylxcSlAVW3BwAAgVg2Qt-KWzso9AWxdLbueAWxdLboX_____w_media.jpg (6/8)
+[I] Grabbed video: iqGdye5oT8ylxcSlAVW3BwAAgRxcJG9KB8fvuAWxd5IQAAWxd5IBO_____w_media.mp4 (7/8)
+[I] Grabbed video: iqGdye5oT8ylxcSlAVW3BwAAg6zi1f6iU5Lv5AWxeA74VAWxeA7rn_____w_media.mp4 (8/8)
 -----------------------------------------------------------------------------------------------
-[I] Finished downloading 2 image(s) and 2 video(s). (Excluding embedded files)                 
+[I] Finished downloading 3 image(s) and 5 video(s). (Excluding embedded files)
 -----------------------------------------------------------------------------------------------
 ```
