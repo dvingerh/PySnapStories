@@ -18,11 +18,23 @@ ansi_escape = re.compile(r'\x1B\[[0-?]*[ -/]*[@-~]')
 sep = "-" * 95
 script_version = "2.1"
 python_version = sys.version.split(' ')[0]
-requests_ua = {'User-Agent': "Mozilla/5.0 (Windows NT 5.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.90 Safari/537.36"}
+request_headers = {
+    'authority': 'search.snapchat.com',
+    'sec-ch-ua': '"Google Chrome 79"',
+    'origin': 'https://story.snapchat.com',
+    'sec-fetch-dest': 'empty',
+    'user-agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/79.0.3945.79 Safari/537.36',
+    'accept': '*/*',
+    'sec-fetch-site': 'same-site',
+    'sec-fetch-mode': 'cors',
+    'referer': 'https://story.snapchat.com/',
+    'accept-encoding': 'gzip, deflate, br',
+    'accept-language': 'nl-NL,nl;q=0.9,en-GB;q=0.8,en;q=0.7,en-US;q=0.6'
+	}
 
 story_endpoints = {
 	"mapStory": "https://storysharing.snapchat.com/v1/fetch/{}",
-	"userStory": "https://storysharing.snapchat.com/v1/fetch/{}",
+	"userStory": "https://search.snapchat.com/lookupStory?id={}",
 	"subjectStory": "https://search.snapchat.com/lookupStory?id={}"
 }
 
@@ -31,10 +43,12 @@ story_type = ""
 story_endpoint_final = ""
 warnings.filterwarnings("ignore", category=DeprecationWarning)
 
+
 def start():
 	global story_endpoint_final
 	log_seperator()
-	log_info_blue('PYSNAPSTORIES (SCRIPT V{:s} - PYTHON V{:s}) - {:s}'.format(script_version, python_version, time.strftime('%I:%M:%S %p')))
+	log_info_blue('PYSNAPSTORIES (SCRIPT V{:s} - PYTHON V{:s}) - {:s}'.format(
+		script_version, python_version, time.strftime('%I:%M:%S %p')))
 	log_seperator()
 
 	is_not_username = False
@@ -57,7 +71,7 @@ def start():
 		elif given_input.startswith("c:"):
 			is_not_username = True
 			log_info_blue("Treating input as subject story.")
-			story_endpoint_final = story_endpoints.get("subjectStory")	
+			story_endpoint_final = story_endpoints.get("subjectStory")
 			story_type = "SUBJECT"
 		else:
 			log_info_blue("Treating input as username. (no ID was detected)")
@@ -68,24 +82,28 @@ def start():
 		log_seperator()
 		exit(1)
 
-
 	if story_type == "MAPMULTI":
-		log_info_green("Starting download for multiple map story ID: \033[93m{:s}".format(given_input))
+		log_info_green(
+			"Starting download for multiple map story ID: \033[93m{:s}".format(given_input))
 		download_map_stories(given_input)
 	elif story_type == "MAPSINGLE":
-		log_info_green("Starting download for single map story ID: \033[93m{:s}".format(given_input))
+		log_info_green(
+			"Starting download for single map story ID: \033[93m{:s}".format(given_input))
 		download_map_stories(given_input)
 	elif story_type == "SUBJECT":
-		log_info_green("Starting download for subject story ID: \033[93m{:s}".format(given_input))
+		log_info_green(
+			"Starting download for subject story ID: \033[93m{:s}".format(given_input))
 		download_subject_stories(given_input)
 	elif story_type == "USERNAME":
-		log_info_green("Starting download for user: \033[93m{:s}".format(given_input))
+		log_info_green(
+			"Starting download for user: \033[93m{:s}".format(given_input))
 		download_user_stories(given_input)
 
 
 def download_subject_stories(snapchat_story_id):
 	try:
-		response = requests.get(story_endpoint_final.format(snapchat_story_id), verify=True, headers={"User-Agent"    : requests_ua["User-Agent"]})
+		response = requests.get(story_endpoint_final.format(
+			snapchat_story_id), verify=True, headers={"User-Agent": request_headers["User-Agent"]})
 		try:
 			response_json = json.loads(response.text)
 		except ValueError:
@@ -99,20 +117,26 @@ def download_subject_stories(snapchat_story_id):
 		stories_video = 0
 
 		snapchat_story_id = slugify(sys.argv[1])
-		snapchat_story_name = slugify(response_json.get("storyTitle", "NoTitle"))
+		snapchat_story_name = slugify(
+			response_json.get("storyTitle", "NoTitle"))
 
-		download_path = os.getcwd() + "/snapchat/{}/".format('{:s}_{:s}'.format(snapchat_story_id, snapchat_story_name))
+		download_path = os.getcwd() + \
+			"/snapchat/{}/".format('{:s}_{:s}'.format(snapchat_story_id,
+													  snapchat_story_name))
 		download_path_overlay = os.path.join(download_path, "overlay")
-		
+
 		if not os.path.exists(download_path_overlay):
 			os.makedirs(download_path_overlay)
 
 		if check_directories('{:s}_{:s}'.format(snapchat_story_id, snapchat_story_name)):
 			if response_json.get("snapList"):
 				log_seperator()
-				log_info_blue("Story Id     : {:s}".format(snapchat_story_id if snapchat_story_id != "NoId" else "Not available"))
-				log_info_blue("Story Title  : {:s}".format(snapchat_story_name if snapchat_story_name != "NoTitle" else "Not available"))
-				log_info_blue("Story amount : {:d}".format(len(response_json.get("snapList"))))
+				log_info_blue("Story Id     : {:s}".format(
+					snapchat_story_id if snapchat_story_id != "NoId" else "Not available"))
+				log_info_blue("Story Title  : {:s}".format(
+					snapchat_story_name if snapchat_story_name != "NoTitle" else "Not available"))
+				log_info_blue("Story amount : {:d}".format(
+					len(response_json.get("snapList"))))
 				log_seperator()
 				for index, snap in enumerate(response_json.get("snapList")):
 					media_url = snap.get("snapUrls").get("mediaUrl")
@@ -123,53 +147,66 @@ def download_subject_stories(snapchat_story_id):
 
 					downloaded_in_iteration = False
 
-
 					if "VIDEO" in media_type:
 						if media_overlay_url:
-							download_path_with_file = os.path.join(download_path_overlay, "{:s}_overlay.png".format(media_id))
-							download_result =  download_story(media_overlay_url, download_path_with_file, is_overlay=True)
+							download_path_with_file = os.path.join(
+								download_path_overlay, "{:s}_overlay.png".format(media_id))
+							download_result = download_story(
+								media_overlay_url, download_path_with_file, is_overlay=True)
 							if download_result == "Error":
 								pass
 							elif download_result == True:
-								log_info_green("Grabbed other: \033[92m{:s}\033[0m".format("{:s}_overlay.png".format(media_id)))
+								log_info_green("Grabbed other: \033[92m{:s}\033[0m".format(
+									"{:s}_overlay.png".format(media_id)))
 							else:
-								log_info_blue("Skipped other: \033[92m{:s}\033[0m".format("{:s}_overlay.png".format(media_id)))
-							
+								log_info_blue("Skipped other: \033[92m{:s}\033[0m".format(
+									"{:s}_overlay.png".format(media_id)))
 
-						download_path_with_file = os.path.join(download_path, "{:s}_media.mp4".format(media_id))
-						download_result =  download_story(media_url.replace("overlay", "media"), download_path_with_file)
+						download_path_with_file = os.path.join(
+							download_path, "{:s}_media.mp4".format(media_id))
+						download_result = download_story(media_url.replace(
+							"overlay", "media"), download_path_with_file)
 						if download_result == "Error":
 							pass
 						elif download_result == True:
 							downloaded_in_iteration = True
 							stories_video += 1
-							log_info_green("Grabbed video: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("snapList"))))
+							log_info_green("Grabbed video: \033[93m{:s}\033[0m ({:d}/{:d})".format(
+								download_path_with_file.split('/')[-1], index+1, len(response_json.get("snapList"))))
 						else:
-							log_info_blue("Skipped video: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("snapList"))))
+							log_info_blue("Skipped video: \033[93m{:s}\033[0m ({:d}/{:d})".format(
+								download_path_with_file.split('/')[-1], index+1, len(response_json.get("snapList"))))
 
 					if "IMAGE" in media_type:
-						download_path_with_file = os.path.join(download_path, "{:s}_media.jpg".format(media_id))
-						download_result =  download_story(media_url, download_path_with_file)
+						download_path_with_file = os.path.join(
+							download_path, "{:s}_media.jpg".format(media_id))
+						download_result = download_story(
+							media_url, download_path_with_file)
 						if download_result == "Error":
 							pass
 						elif download_result == True:
 							downloaded_in_iteration = True
 							stories_image += 1
-							log_info_green("Grabbed image: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("snapList"))))
+							log_info_green("Grabbed image: \033[93m{:s}\033[0m ({:d}/{:d})".format(
+								download_path_with_file.split('/')[-1], index+1, len(response_json.get("snapList"))))
 						else:
-							log_info_blue("Skipped image: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("snapList"))))
-
+							log_info_blue("Skipped image: \033[93m{:s}\033[0m ({:d}/{:d})".format(
+								download_path_with_file.split('/')[-1], index+1, len(response_json.get("snapList"))))
 
 				log_seperator()
 				if stories_image and stories_video:
-					log_info_green("Finished downloading {:d} image(s) and {:d} video(s).".format(stories_image, stories_video))
+					log_info_green("Finished downloading {:d} image(s) and {:d} video(s).".format(
+						stories_image, stories_video))
 				elif stories_image:
-					log_info_green("Finished downloading {:d} image(s).".format(stories_image))
+					log_info_green(
+						"Finished downloading {:d} image(s).".format(stories_image))
 				elif stories_video:
-					log_info_green("Finished downloading {:d} video(s).".format(stories_video))
+					log_info_green(
+						"Finished downloading {:d} video(s).".format(stories_video))
 
 				else:
-					log_info_green("No new stories have been downloaded.".format(stories_image, stories_video))
+					log_info_green("No new stories have been downloaded.".format(
+						stories_image, stories_video))
 				log_seperator()
 			else:
 				log_seperator()
@@ -179,7 +216,8 @@ def download_subject_stories(snapchat_story_id):
 				exit(2)
 		else:
 			log_seperator()
-			log_error("Could not make required directories. Ensure you have write permissions.")
+			log_error(
+				"Could not make required directories. Ensure you have write permissions.")
 			log_error("The script cannot continue, exiting.")
 			exit(1)
 	except Exception as e:
@@ -188,93 +226,113 @@ def download_subject_stories(snapchat_story_id):
 		log_error("The script cannot continue, exiting.")
 		exit(1)
 
+
 def download_user_stories(snapchat_story_id):
 	try:
-		if "--verbose" in str(sys.argv):
-				log_info_blue("Waiting for JSON response from Snapchat..")
-		response = requests.get(story_endpoint_final.format(snapchat_story_id), verify=True, headers={
-					"User-Agent"    : requests_ua["User-Agent"]
-				})
-		if "--verbose" in str(sys.argv):
-				log_info_blue("Got JSON response, reading contents..")
-
-		if "rpc error: code = NotFound desc = Not found." in response.text:
+		response = requests.get(story_endpoint_final.format(snapchat_story_id), headers=request_headers)
+		try:
+			response_json = json.loads(response.text)
+		except ValueError:
 			log_seperator()
-			log_error("This username does not belong to an officially verified account.")
+			log_error("The given username did not return any stories.")
 			log_error("The script cannot continue, exiting.")
 			log_seperator()
 			exit(1)
-		else:
-			response_json = json.loads(response.text)
 
 		stories_image = 0
 		stories_video = 0
 
-		snapchat_story_id = response_json.get("story").get("id", "NoId")
-		snapchat_story_name = response_json.get("story").get("metadata").get("title", "NoTitle")
+		snapchat_story_id = slugify(sys.argv[1])
+		snapchat_story_name = slugify(
+			response_json.get("storyTitle", "NoTitle"))
 
-		download_path = os.getcwd() + "/snapchat/{}/".format('{:s}_{:s}'.format(snapchat_story_id, slugify(snapchat_story_name)))
-		download_path_embedded = os.path.join(download_path, "embedded")
-		
-		if not os.path.exists(download_path_embedded):
-			os.makedirs(download_path_embedded)
+		download_path = os.getcwd() + \
+			"/snapchat/{}/".format('{:s}_{:s}'.format(snapchat_story_id,
+													  snapchat_story_name))
+		download_path_overlay = os.path.join(download_path, "overlay")
 
-		if check_directories('{:s}_{:s}'.format(snapchat_story_id, slugify(snapchat_story_name))):
-			if response_json.get("story").get("snaps"):
+		if not os.path.exists(download_path_overlay):
+			os.makedirs(download_path_overlay)
+
+		if check_directories('{:s}_{:s}'.format(snapchat_story_id, snapchat_story_name)):
+			if response_json.get("snapList"):
 				log_seperator()
-				log_info_blue("Story Id     : {:s}".format(snapchat_story_id if snapchat_story_id != "NoId" else "Not available"))
-				log_info_blue("Story Title  : {:s}".format(snapchat_story_name if snapchat_story_name != "NoTitle" else "Not available"))
-				log_info_blue("Story amount : {:d}".format(len(response_json.get("story").get("snaps"))))
+				log_info_blue("Story Id     : {:s}".format(
+					snapchat_story_id if snapchat_story_id != "NoId" else "Not available"))
+				log_info_blue("Story Title  : {:s}".format(
+					snapchat_story_name if snapchat_story_name != "NoTitle" else "Not available"))
+				log_info_blue("Story amount : {:d}".format(
+					len(response_json.get("snapList"))))
 				log_seperator()
-				for index, snap in enumerate(response_json.get("story").get("snaps")):
-					media_type = snap.get("media").get("type")
-					media_url = snap.get("media").get("mediaUrl")
-					media_ts = snap.get("captureTimeSecs")
-					media_id = snap.get("id")
+				for index, snap in enumerate(response_json.get("snapList")):
+					media_url = snap.get("snapUrls").get("mediaUrl")
+					media_overlay_url = snap.get("snapUrls").get("overlayUrl")
+					media_type = "VIDEO" if ".mp4" in media_url else "IMAGE"
+					media_ts = snap.get("timestampInSec")
+					media_id = snap.get("snapId")
 
-					is_embedded = media_url.endswith("embedded.mp4")
 					downloaded_in_iteration = False
 
-
 					if "VIDEO" in media_type:
-						if is_embedded:
-							download_path_with_file = os.path.join(download_path_embedded, "{:s}_embedded.mp4".format(media_id))
-							download_result =  download_story(media_url, download_path_with_file)
+						if media_overlay_url:
+							download_path_with_file = os.path.join(
+								download_path_overlay, "{:s}_overlay.png".format(media_id))
+							download_result = download_story(
+								media_overlay_url, download_path_with_file, is_overlay=True)
+							if download_result == "Error":
+								pass
+							elif download_result == True:
+								log_info_green("Grabbed other: \033[92m{:s}\033[0m".format(
+									"{:s}_overlay.png".format(media_id)))
+							else:
+								log_info_blue("Skipped other: \033[92m{:s}\033[0m".format(
+									"{:s}_overlay.png".format(media_id)))
 
-						download_path_with_file = os.path.join(download_path, "{:s}_media.mp4".format(media_id))
-						download_result =  download_story(media_url.replace("embedded", "media"), download_path_with_file)
+						download_path_with_file = os.path.join(
+							download_path, "{:s}_media.mp4".format(media_id))
+						download_result = download_story(media_url.replace(
+							"overlay", "media"), download_path_with_file)
 						if download_result == "Error":
 							pass
 						elif download_result == True:
 							downloaded_in_iteration = True
 							stories_video += 1
-							log_info_green("Grabbed video: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("story").get("snaps"))))
+							log_info_green("Grabbed video: \033[93m{:s}\033[0m ({:d}/{:d})".format(
+								download_path_with_file.split('/')[-1], index+1, len(response_json.get("snapList"))))
 						else:
-							log_info_blue("Skipped video: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("story").get("snaps"))))
+							log_info_blue("Skipped video: \033[93m{:s}\033[0m ({:d}/{:d})".format(
+								download_path_with_file.split('/')[-1], index+1, len(response_json.get("snapList"))))
 
 					if "IMAGE" in media_type:
-						download_path_with_file = os.path.join(download_path, "{:s}_media.jpg".format(media_id))
-						download_result =  download_story(media_url, download_path_with_file)
+						download_path_with_file = os.path.join(
+							download_path, "{:s}_media.jpg".format(media_id))
+						download_result = download_story(
+							media_url, download_path_with_file)
 						if download_result == "Error":
 							pass
 						elif download_result == True:
 							downloaded_in_iteration = True
 							stories_image += 1
-							log_info_green("Grabbed image: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("story").get("snaps"))))
+							log_info_green("Grabbed image: \033[93m{:s}\033[0m ({:d}/{:d})".format(
+								download_path_with_file.split('/')[-1], index+1, len(response_json.get("snapList"))))
 						else:
-							log_info_blue("Skipped image: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("story").get("snaps"))))
-
+							log_info_blue("Skipped image: \033[93m{:s}\033[0m ({:d}/{:d})".format(
+								download_path_with_file.split('/')[-1], index+1, len(response_json.get("snapList"))))
 
 				log_seperator()
 				if stories_image and stories_video:
-					log_info_green("Finished downloading {:d} image(s) and {:d} video(s). (Excluding embedded files)".format(stories_image, stories_video))
+					log_info_green("Finished downloading {:d} image(s) and {:d} video(s).".format(
+						stories_image, stories_video))
 				elif stories_image:
-					log_info_green("Finished downloading {:d} image(s). (Excluding embedded files)".format(stories_image))
+					log_info_green(
+						"Finished downloading {:d} image(s).".format(stories_image))
 				elif stories_video:
-					log_info_green("Finished downloading {:d} video(s). (Excluding embedded files)".format(stories_video))
+					log_info_green(
+						"Finished downloading {:d} video(s).".format(stories_video))
 
 				else:
-					log_info_green("No new stories have been downloaded. (Excluding embedded files)".format(stories_image, stories_video))
+					log_info_green("No new stories have been downloaded.".format(
+						stories_image, stories_video))
 				log_seperator()
 			else:
 				log_seperator()
@@ -283,20 +341,24 @@ def download_user_stories(snapchat_story_id):
 				log_seperator()
 				exit(2)
 		else:
-			log_error("Could not make required directories. Ensure you have write permissions.")
+			log_seperator()
+			log_error(
+				"Could not make required directories. Ensure you have write permissions.")
 			log_error("The script cannot continue, exiting.")
 			exit(1)
 	except Exception as e:
+		log_seperator()
 		log_error("Something went wrong: {:s}".format(str(e)))
 		log_error("The script cannot continue, exiting.")
 		exit(1)
+
 
 def download_map_stories(snapchat_story_id):
 	try:
 
 		response = requests.get(story_endpoint_final.format(snapchat_story_id), verify=True, headers={
-					"User-Agent"    : requests_ua["User-Agent"]
-				})
+			"User-Agent": request_headers["User-Agent"]
+		})
 
 		if "rpc error: code = NotFound desc = Not found." in response.text:
 			log_seperator()
@@ -310,21 +372,28 @@ def download_map_stories(snapchat_story_id):
 		stories_image = 0
 		stories_video = 0
 
-		snapchat_story_id = slugify(response_json.get("story").get("id", "NoId"))
-		snapchat_story_name = slugify(response_json.get("story").get("metadata").get("title", "NoTitle"))
+		snapchat_story_id = slugify(
+			response_json.get("story").get("id", "NoId"))
+		snapchat_story_name = slugify(response_json.get(
+			"story").get("metadata").get("title", "NoTitle"))
 
-		download_path = os.getcwd() + "/snapchat/{}/".format('{:s}_{:s}'.format(snapchat_story_id, snapchat_story_name))
+		download_path = os.getcwd() + \
+			"/snapchat/{}/".format('{:s}_{:s}'.format(snapchat_story_id,
+													  snapchat_story_name))
 		download_path_embedded = os.path.join(download_path, "embedded")
-		
+
 		if not os.path.exists(download_path_embedded):
 			os.makedirs(download_path_embedded)
 
 		if check_directories('{:s}_{:s}'.format(snapchat_story_id, snapchat_story_name)):
 			if response_json.get("story").get("snaps"):
 				log_seperator()
-				log_info_blue("Story Id     : {:s}".format(snapchat_story_id if snapchat_story_id != "NoId" else "Not available"))
-				log_info_blue("Story Title  : {:s}".format(snapchat_story_name if snapchat_story_name != "NoTitle" else "Not available"))
-				log_info_blue("Story amount : {:d}".format(len(response_json.get("story").get("snaps"))))
+				log_info_blue("Story Id     : {:s}".format(
+					snapchat_story_id if snapchat_story_id != "NoId" else "Not available"))
+				log_info_blue("Story Title  : {:s}".format(
+					snapchat_story_name if snapchat_story_name != "NoTitle" else "Not available"))
+				log_info_blue("Story amount : {:d}".format(
+					len(response_json.get("story").get("snaps"))))
 				log_seperator()
 				for index, snap in enumerate(response_json.get("story").get("snaps")):
 					media_type = snap.get("media").get("type")
@@ -335,46 +404,58 @@ def download_map_stories(snapchat_story_id):
 					is_embedded = media_url.endswith("embedded.mp4")
 					downloaded_in_iteration = False
 
-
 					if "VIDEO" in media_type:
 						if is_embedded:
-							download_path_with_file = os.path.join(download_path_embedded, "{:s}_embedded.mp4".format(media_id))
-							download_result =  download_story(media_url, download_path_with_file)
+							download_path_with_file = os.path.join(
+								download_path_embedded, "{:s}_embedded.mp4".format(media_id))
+							download_result = download_story(
+								media_url, download_path_with_file)
 
-						download_path_with_file = os.path.join(download_path, "{:s}_media.mp4".format(media_id))
-						download_result =  download_story(media_url.replace("embedded", "media"), download_path_with_file)
+						download_path_with_file = os.path.join(
+							download_path, "{:s}_media.mp4".format(media_id))
+						download_result = download_story(media_url.replace(
+							"embedded", "media"), download_path_with_file)
 						if download_result == "Error":
 							pass
 						elif download_result == True:
 							downloaded_in_iteration = True
 							stories_video += 1
-							log_info_green("Grabbed video: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("story").get("snaps"))))
+							log_info_green("Grabbed video: \033[93m{:s}\033[0m ({:d}/{:d})".format(
+								download_path_with_file.split('/')[-1], index+1, len(response_json.get("story").get("snaps"))))
 						else:
-							log_info_blue("Skipped video: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("story").get("snaps"))))
+							log_info_blue("Skipped video: \033[93m{:s}\033[0m ({:d}/{:d})".format(
+								download_path_with_file.split('/')[-1], index+1, len(response_json.get("story").get("snaps"))))
 
 					if "IMAGE" in media_type:
-						download_path_with_file = os.path.join(download_path, "{:s}_media.jpg".format(media_id))
-						download_result =  download_story(media_url, download_path_with_file)
+						download_path_with_file = os.path.join(
+							download_path, "{:s}_media.jpg".format(media_id))
+						download_result = download_story(
+							media_url, download_path_with_file)
 						if download_result == "Error":
 							pass
 						elif download_result == True:
 							downloaded_in_iteration = True
 							stories_image += 1
-							log_info_green("Grabbed image: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("story").get("snaps"))))
+							log_info_green("Grabbed image: \033[93m{:s}\033[0m ({:d}/{:d})".format(
+								download_path_with_file.split('/')[-1], index+1, len(response_json.get("story").get("snaps"))))
 						else:
-							log_info_blue("Skipped image: \033[93m{:s}\033[0m ({:d}/{:d})".format(download_path_with_file.split('/')[-1], index+1, len(response_json.get("story").get("snaps"))))
-
+							log_info_blue("Skipped image: \033[93m{:s}\033[0m ({:d}/{:d})".format(
+								download_path_with_file.split('/')[-1], index+1, len(response_json.get("story").get("snaps"))))
 
 				log_seperator()
 				if stories_image and stories_video:
-					log_info_green("Finished downloading {:d} image(s) and {:d} video(s). (Excluding embedded files)".format(stories_image, stories_video))
+					log_info_green("Finished downloading {:d} image(s) and {:d} video(s). (Excluding embedded files)".format(
+						stories_image, stories_video))
 				elif stories_image:
-					log_info_green("Finished downloading {:d} image(s). (Excluding embedded files)".format(stories_image))
+					log_info_green(
+						"Finished downloading {:d} image(s). (Excluding embedded files)".format(stories_image))
 				elif stories_video:
-					log_info_green("Finished downloading {:d} video(s). (Excluding embedded files)".format(stories_video))
+					log_info_green(
+						"Finished downloading {:d} video(s). (Excluding embedded files)".format(stories_video))
 
 				else:
-					log_info_green("No new stories have been downloaded. (Excluding embedded files)".format(stories_image, stories_video))
+					log_info_green("No new stories have been downloaded. (Excluding embedded files)".format(
+						stories_image, stories_video))
 				log_seperator()
 			else:
 				log_seperator()
@@ -383,13 +464,15 @@ def download_map_stories(snapchat_story_id):
 				log_seperator()
 				exit(2)
 		else:
-			log_error("Could not make required directories. Ensure you have write permissions.")
+			log_error(
+				"Could not make required directories. Ensure you have write permissions.")
 			log_error("The script cannot continue, exiting.")
 			exit(1)
 	except Exception as e:
 		log_error("Something went wrong: {:s}".format(str(e)))
 		log_error("The script cannot continue, exiting.")
 		exit(1)
+
 
 def download_story(media_url, save_path):
 	if not os.path.exists(save_path):
@@ -403,11 +486,11 @@ def download_story(media_url, save_path):
 		return False
 
 
-
 def check_directories(snapchat_story_id):
 	try:
 		if not os.path.isdir(os.getcwd() + "/snapchat/{}/".format(snapchat_story_id)):
-			os.makedirs(os.getcwd() + "/snapchat/{}/".format(snapchat_story_id))
+			os.makedirs(
+				os.getcwd() + "/snapchat/{}/".format(snapchat_story_id))
 		return True
 	except Exception:
 		return False
@@ -424,7 +507,8 @@ def supports_color():
 		"""
 
 		plat = sys.platform
-		supported_platform = plat != 'Pocket PC' and (plat != 'win32' or 'ANSICON' in os.environ)
+		supported_platform = plat != 'Pocket PC' and (
+			plat != 'win32' or 'ANSICON' in os.environ)
 
 		# isatty is not always implemented, #6223.
 		is_a_tty = hasattr(sys.stdout, 'isatty') and sys.stdout.isatty()
@@ -433,7 +517,6 @@ def supports_color():
 		return "Yes", True
 	except Exception as e:
 		print("Error while logging: {}" + str(e))
-
 
 
 def log_seperator():
@@ -505,7 +588,7 @@ def log_plain(string):
 
 
 # Slugifying method https://blog.dolphm.com/slugify-a-string-in-python/
- 
+
 def slugify(s):
 
 	s.lower()
@@ -524,5 +607,6 @@ def slugify(s):
 	s = s.replace(' ', '-')
 
 	return s
+
 
 start()
