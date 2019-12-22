@@ -152,7 +152,7 @@ def download_subject_stories(snapchat_story_id):
                             download_path_with_file = os.path.join(
                                 download_path_overlay, "{:s}_overlay.png".format(media_id))
                             download_result = download_story(
-                                media_overlay_url, download_path_with_file, is_overlay=True)
+                                media_overlay_url, download_path_with_file)
                             if download_result == "Error":
                                 pass
                             elif download_result == True:
