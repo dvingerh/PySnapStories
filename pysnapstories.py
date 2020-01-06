@@ -150,7 +150,7 @@ def download_subject_stories(snapchat_story_id):
                     if "VIDEO" in media_type:
                         if media_overlay_url:
                             download_path_with_file = os.path.join(
-                                download_path_overlay, "{:s}_overlay.png".format(media_id))
+                                download_path_overlay, "{:s}_{:d}_overlay.png".format(media_id, int(round(time.time() * 1000))))
                             download_result = download_story(
                                 media_overlay_url, download_path_with_file)
                             if download_result == "Error":
@@ -163,7 +163,7 @@ def download_subject_stories(snapchat_story_id):
                                     "{:s}_overlay.png".format(media_id)))
 
                         download_path_with_file = os.path.join(
-                            download_path, "{:s}_media.mp4".format(media_id))
+                            download_path, "{:s}_{:d}_media.mp4".format(media_id, int(round(time.time() * 1000))))
                         download_result = download_story(media_url.replace(
                             "overlay", "media"), download_path_with_file)
                         if download_result == "Error":
@@ -179,7 +179,7 @@ def download_subject_stories(snapchat_story_id):
 
                     if "IMAGE" in media_type:
                         download_path_with_file = os.path.join(
-                            download_path, "{:s}_media.jpg".format(media_id))
+                            download_path, "{:s}_{:d}_media.jpg".format(media_id, int(round(time.time() * 1000))))
                         download_result = download_story(
                             media_url, download_path_with_file)
                         if download_result == "Error":
@@ -279,12 +279,12 @@ def download_user_stories(snapchat_story_id):
                     if "VIDEO" in media_type:
                         if is_embedded:
                             download_path_with_file = os.path.join(
-                                download_path_embedded, "{:s}_embedded.mp4".format(media_id))
+                                download_path_embedded, "{:s}_{:d}_embedded.mp4".format(media_id, int(round(time.time() * 1000))))
                             download_result = download_story(
                                 media_url, download_path_with_file)
 
                         download_path_with_file = os.path.join(
-                            download_path, "{:s}_media.mp4".format(media_id))
+                            download_path, "{:s}_{:d}_media.mp4".format(media_id, int(round(time.time() * 1000))))
                         download_result = download_story(media_url.replace(
                             "embedded", "media"), download_path_with_file)
                         if download_result == "Error":
@@ -300,7 +300,7 @@ def download_user_stories(snapchat_story_id):
 
                     if "IMAGE" in media_type:
                         download_path_with_file = os.path.join(
-                            download_path, "{:s}_media.jpg".format(media_id))
+                            download_path, "{:s}_{:d}_media.jpg".format(media_id, int(round(time.time() * 1000))))
                         download_result = download_story(
                             media_url, download_path_with_file)
                         if download_result == "Error":
@@ -400,12 +400,12 @@ def download_map_stories(snapchat_story_id):
                     if "VIDEO" in media_type:
                         if is_embedded:
                             download_path_with_file = os.path.join(
-                                download_path_embedded, "{:s}_embedded.mp4".format(media_id))
+                                download_path_embedded, "{:s}_{:d}_embedded.mp4".format(media_id, int(round(time.time() * 1000))))
                             download_result = download_story(
                                 media_url, download_path_with_file)
 
                         download_path_with_file = os.path.join(
-                            download_path, "{:s}_media.mp4".format(media_id))
+                            download_path, "{:s}_{:d}_media.mp4".format(media_id, int(round(time.time() * 1000))))
                         download_result = download_story(media_url.replace(
                             "embedded", "media"), download_path_with_file)
                         if download_result == "Error":
@@ -421,7 +421,7 @@ def download_map_stories(snapchat_story_id):
 
                     if "IMAGE" in media_type:
                         download_path_with_file = os.path.join(
-                            download_path, "{:s}_media.jpg".format(media_id))
+                            download_path, "{:s}_{:d}_media.jpg".format(media_id, int(round(time.time() * 1000))))
                         download_result = download_story(
                             media_url, download_path_with_file)
                         if download_result == "Error":
